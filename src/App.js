@@ -1,32 +1,37 @@
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './Component/Header';
-import { Routes, Route } from "react-router-dom"
-import Product from './Component/Product';
-import Caterory from './Component/Caterory';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Categories from './Component/Caterory';
+import { Route, Routes } from 'react-router-dom';
+import Data from './Component/Product';
 import { useEffect, useState } from 'react';
 import Cart from './Component/Cart';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Product from './Component/Product';
 
 function App() {
 
-  const[Alldata,setAlldata]=useState('');
+  // const [Alldata, setAlldata] = useState('');
 
-  useEffect(() => {
-    fetch('https://dummyjson.com/products')
-    .then(response => response.json())
-    .then(data => setAlldata(data.products))
-  })
+
+  // useEffect(() => {
+  //   fetch('https://dummyjson.com/products/')
+  //     .then(response => response.json())
+  //     .then(data => setAlldata(data.products));
+  // }, []);
 
   return (
     <>
-      <Header/>
+      <Header />
+      <ToastContainer />
       <Routes>
-        <Route path="/" element={ <Product data={Alldata}/> } />
-        <Route path="/caterory/:id" element={ <Caterory/> } />
-        <Route path="/cart" element={ <Cart /> } />
+        <Route path="/" element={<Product  />} />
+        <Route path='/data/:id' element={<Categories />} />
+        <Route path='/cart' element={<Cart />} />
       </Routes>
     </>
   );
 }
 
-export default App;
+export default App;

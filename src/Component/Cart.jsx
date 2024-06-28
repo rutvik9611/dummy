@@ -1,94 +1,70 @@
-import React, { useEffect } from 'react';
-import { Col, Row } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Col, Container, Row, Table } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { BiDollar } from 'react-icons/bi';
-import { } from '../Slice/counterSlice';
+import { decrement, increment, removeFromCart } from '../Slice/counterSlice';
 
 function Cart() {
-    const cartItems = useSelector((state) => state.cart.cartitem);
+    const cartData = useSelector((state) => state.counter.cart);
     const dispatch = useDispatch();
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
-        dispatch(cartItems());
-    }, []);
+        let totalPrice = 0;
+        cartData.forEach(item => {
+            totalPrice += item.price * item.quantity;
+        });
+        setTotal(totalPrice);
+    }, [cartData]);
+
+    const handleRemoveFromCart = (productId) => {
+        dispatch(removeFromCart(productId));
+    };
+
+    const handleIncrement = (productId) => {
+        dispatch(increment(productId));
+    };
+
+    const handleDecrement = (productId) => {
+        dispatch(decrement(productId));
+    };
 
     return (
-        <div className="px-3">
-            <p className="fs-3 fw-medium">Shopping Cart</p>
-            {cartItems.length > 0 ? (
-                cartItems.map((item, index) => (
-                    <Row key={index} className="justify-content-center">
-                        <Col xl={1} className="align-content-center">
-                            <p
-                                className="text-blue cursor-pointer"
-                                // onClick={() => dispatch(removeitem(index))}
-                            >
-                                Remove
-                            </p>
-                        </Col>
-                        <Col xl={2} className="align-content-center">
-                            <img src={item.images[0]} alt="" className="w-75" />
-                        </Col>
-                        <Col xl={5} className="align-content-center">
-                            <p className="fs-5 fw-medium mb-1">{item.title}</p>
-                            <p className="text-success f-14">{item.availabilityStatus}</p>
-                            <p className="mt-1">
-                                <span className="fw-medium f-14">Quantity:</span>
-                                <select
-                                    name="quantity"
-                                    className="mx-2"
-                                    // value={quantities[index]}
-                                    // onChange={(e) => dispatch(getquantity([e.target.value, index]))}
-                                >
-                                    {[...Array(15).keys()].slice(1).map((qty) => (
-                                        <option key={qty} value={qty}>
-                                            {qty}
-                                        </option>
-                                    ))}
-                                </select>
-                                <sup className="fs-6" title={`Minimum ${item.minimumOrderQuantity} quantity Order`}>
-                                    *
-                                </sup>
-                            </p>
-                        </Col>
-                        <Col xl={2} className="border-start align-content-center">
-                            <p className="mb-0">
-                                <BiDollar className="dollar-sign mb-3" />
-                                <span className="fs-4 fw-medium">
-                                    {(item.price * (1 - item.discountPercentage / 100)).toFixed(2)}
-                                </span>
-                            </p>
-                            <p className="f-13">
-                                <span className="f-13 text-secondary mx-1">
-                                    M.R.P.
-                                    <del className="text-secondary">
-                                        <BiDollar className="mb-1" />
-                                        {item.price}
-                                    </del>
-                                </span>
-                                <span className="text-black">({item.discountPercentage}% Off)</span>
-                            </p>
-                        </Col>
-                        <Col xl={1} className="border-start align-content-center">
-                            <p className="mb-0">
-                                <BiDollar className="dollar-sign mb-3" />
-                                <span className="fs-4 fw-medium">
-                                    {/* {((item.price * (1 - item.discountPercentage / 100)) * quantities[index]).toFixed(2)} */}
-                                </span>
-                            </p>
-                        </Col>
-                    </Row>
-                ))
-            ) : (
-                <p className="fs-4 text-center">Your cart is empty</p>
-            )}
-            {/* {totalAmount !== 0 && (
-                <p className="fs-3 text-end">
-                    Total cart: <span>{Math.round(totalAmount)}</span>
-                </p>
-            )} */}
-        </div>
-    );
+        <Container>
+            <Row>
+                <Col lg={9} className='mt-4 pb-5 border'>
+                    {
+                        cartData.map((item, index) => (
+                            <div className='d-flex flex-md-nowrap gap-3 p-2 flex-wrap justify-content-center w-100'>
+                                <div className="image-cart"><img src={item.thumbnail} alt="" /></div>
+                                <div className="text-cart w-100 mt-5">
+                                    <h5 className='mt-2'>{item.title} ({item.category})</h5>
+                                    <h6 style={{ color: '#878dae' }}>Category : <span   >{item.category}</span> </h6>
+                                    <p>{item.price}   {item.discountPercentage}%</p>
+                                    <div className='mt-2 d-flex w-100 justify-content-around'>
+                                        <div className='d-flex align-items-center justify-content-between'>
+                                            <button onClick={() => handleDecrement(item.id)} style={{ border: '0', padding: '5px 15px ' }}>-</button>
+                                            <input type='number' className='mx-auto' value={item.quantity} readOnly style={{ width: '40px', border: '0', textAlign: 'center' }} />
+                                            <button onClick={() => handleIncrement(item.id)} style={{ border: '0', padding: '5px 15px ' }}>+</button>
+                                        </div>
+                                        <div className='d-flex'>
+                                            <h5> Total : {(item.price * item.quantity).toFixed(2)}</h5>
+                                            <button onClick={() => handleRemoveFromCart(item.id)} className='ms-5'>Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    }
+
+                </Col>
+                <Col lg={3} className='mt-4'>
+                    <div className="total-cart border p-3">
+                        <p className='fs-6 m-0'>Total: ₹ {total.toFixed(2)}</p>
+                    </div>
+                </Col>
+            </Row>
+        </Container >
+    )
 }
 
-export default Cart;
+export default Cart;

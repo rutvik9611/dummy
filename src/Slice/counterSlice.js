@@ -1,32 +1,63 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit';
+import { toast } from 'react-toastify';
 
 const initialState = {
-  cartItems: []
+  value: 0,
+  cart: [],
+  searching:''
 }
 
-export const cartSlice = createSlice({
-  name: 'cart',
+export const counterSlice = createSlice({
+  name: 'counter',
   initialState,
   reducers: {
-    // addCart: (state, action) => {
-    //   const existingItem = state.cartItems.find(item => item.id === action.payload.id);
-    //   if (existingItem) {
-    //     existingItem.quantity += action.payload.quantity;
-    //     existingItem.totalPrice += action.payload.quantity * action.payload.price;
-    //   } else {
-    //     state.cartItems.push({
-    //       ...action.payload,
-    //       totalPrice: action.payload.quantity * action.payload.price
-    //     });
-    //   }
-    //   state.totalQuantity += action.payload.quantity;
-    //   state.totalPrice += action.payload.quantity * action.payload.price;
-    // },
-    
+    increment: (state, action) => {
+      const id = action.payload;
+      const item = state.cart.find((i) => i.id === id);
+      if (item) {
+        item.quantity += 1;
+      }
+    },
+    decrement: (state, action) => {
+      const id = action.payload;
+      const item = state.cart.find((i) => i.id === id);
+      if (item && item.quantity > 1) {
+        item.quantity -= 1;
+      }
+    },
+    removeFromCart: (state, action) => {
+      const productId = action.payload;
+      state.cart = state.cart.filter(item => item.id != productId);
+      toast.success(`Item Removed Successfully`, {
+        position: "bottom-left",
+        autoClose: 1000,
+        pauseOnHover: true,
+      });
+    },
+    addtoCart: (state, action) => {
+      const addcart = action.payload;
+      let temp = state.cart.filter((item) => item.id === action.payload.id);
+      if (temp.length === 0) {
+        state.cart.push({ ...addcart, quantity: 1 });
+        toast.success(`${addcart.title} Added Successfully`, {
+          position: "bottom-left",
+          autoClose: 1800,
+          pauseOnHover: true,
+        });
+      } else {
+        toast.error(`${addcart.title} Already in Cart`, {
+          position: "bottom-left",
+          autoClose: 1800,
+          pauseOnHover: true,
+        });
+      }
+    },
+    getsearch:(state,action)=>{
+      state.searching = action.payload;
+    },
   },
 })
 
-// Action creators are generated for each case reducer function
-export const { addCart } = cartSlice.actions
+export const { increment, decrement, addtoCart, removeFromCart , getsearch } = counterSlice.actions
 
-export default cartSlice.reducer
+export default counterSlice.reducer
